@@ -1,0 +1,107 @@
+/*
+ * Copyright (c) 2000-2019 Devin Smith <devin@devinsmith.net>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+/* Wedit generated resource file */
+#include <windows.h>
+#include "opennakenres.h"
+
+IDMAINMENU MENU
+BEGIN
+    POPUP "&File"
+        BEGIN
+        MENUITEM "&New Connection", IDM_NEW
+        MENUITEM "&Disconnect", IDM_DISC
+        MENUITEM "&Properties", IDM_PROP
+        MENUITEM "&E&xit", IDM_EXIT
+        END
+    POPUP "&Edit"
+        BEGIN
+        MENUITEM "&Copy", IDM_EDITCOPY
+        MENUITEM "&Paste", IDM_EDITPASTE
+        MENUITEM "Clear", IDM_CLEAR
+        END
+    POPUP "&Help"
+        BEGIN
+        MENUITEM "&About", IDM_ABOUT
+        MENUITEM "&Help..", IDM_HELP
+        END
+END
+IDACCEL ACCELERATORS
+BEGIN
+    81, IDM_EXIT, VIRTKEY, CONTROL
+END
+
+IDD_ABOUT DIALOG 6, 18, 180, 180
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "About OpenNaken"
+FONT 8, "Helv"
+BEGIN
+    LTEXT           "Written by:", ONC_ICON, 23, 64, 65, 12
+    GROUPBOX        "OpenNaken Information", 102, 11, 46, 158, 102
+    ICON            ONC_ICON, -1, 15, 12, 21, 20
+    PUSHBUTTON      "OK", IDOK, 11, 156, 40, 14
+    LTEXT           "Devin Smith", 104, 34, 89, 70, 12
+    CONTROL         "OPENNAKEN", 106, "Static", SS_LEFTNOWORDWRAP | WS_GROUP,
+                    51, 14, 102, 26
+    LTEXT           "Special thanks to Mike for helping me and creating a ""unique"" server",
+                    107, 27, 113, 114, 29
+    PUSHBUTTON      "Web Page", ID_WEBP, 76, 156, 91, 14, WS_DISABLED
+END
+101 ICON FLOPPY.ICO
+
+IDD_NEW DIALOG 119, 140, 205, 120
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "New Connection..."
+FONT 8, "Helv"
+BEGIN
+    EDITTEXT        IDN_NAME, 81, 17, 50, 12, ES_AUTOHSCROLL
+    LTEXT           "Name:", 302, 22, 17, 48, 12
+    LTEXT           "Server:", 304, 22, 39, 31, 12
+    LTEXT           "Port:", 305, 24, 70, 22, 12
+    AUTORADIOBUTTON "6666", 306, 86, 70, 39, 10
+    AUTORADIOBUTTON "6667", 307, 130, 70, 39, 10
+    DEFPUSHBUTTON   "Connect!", IDCONNECT, 151, 97, 40, 14
+    PUSHBUTTON      "Cancel", IDCANCEL, 110, 97, 40, 14
+    EDITTEXT        IDN_SERVER, 81, 38, 91, 12, ES_AUTOHSCROLL
+END
+
+IDD_PROP DIALOG 119, 140, 205, 120
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_BORDER | WS_SYSMENU
+FONT 8, "Helv"
+BEGIN
+    LTEXT           "Don't use this", IDD_CONNECT, 13, 90, 90, 12
+    LTEXT           "This window is not yet finisehd", 403, 12, 72, 152, 16
+    AUTOCHECKBOX    "Sounds", 404, 11, 21, 40, 10
+    PUSHBUTTON      "Background", ID_CHANGEBG, 11, 34, 50, 14
+    PUSHBUTTON      "Foreground", IDB_FOREG, 11, 50, 50, 14
+END
+
+IDD_CONNECT DIALOG 119, 140, 205, 120
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_BORDER | WS_SYSMENU
+FONT 8, "Helv"
+BEGIN
+    LTEXT           "Don't use this", IDD_CONNECT, 13, 90, 90, 12
+    LTEXT           "This window is not yet finisehd", 403, 12, 72, 152, 16
+    AUTOCHECKBOX    "Sounds", 404, 11, 21, 40, 10
+    PUSHBUTTON      "Background", ID_CHANGEBG, 11, 34, 50, 14
+    PUSHBUTTON      "Foreground", IDB_FOREG, 11, 50, 50, 14
+END
