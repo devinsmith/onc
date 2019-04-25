@@ -212,7 +212,7 @@ MainWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   return 0;
 }
 
-int window_register(const char *classname, const char *text)
+int window_register(const char *classname, const char *icon)
 {
   WNDCLASS wc;
 
@@ -226,10 +226,8 @@ int window_register(const char *classname, const char *text)
   wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
   wc.lpszClassName = classname;
   wc.lpszMenuName = MAKEINTRESOURCE(IDMAINMENU);
-  wc.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(ONC_ICON));
+  wc.hIcon = LoadIcon(hInst, icon);
   if (!RegisterClass(&wc)) {
-    MessageBox(NULL, "This program requires a Windows based OS",
-        text, MB_OK);
     return 0;
   }
 

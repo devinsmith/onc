@@ -50,7 +50,8 @@ struct window {
 };
 
 
-int window_register(const char *className, const char *text);
+int window_register(const char *className, const char *icon);
+
 void window_show(window *wnd);
 window *window_create(const char *className, const char *title);
 window *window_input_create(window *parent);

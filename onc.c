@@ -270,8 +270,11 @@ int main(int argc, const char *argv[])
 
   set_accelerators();
 
-  if (!window_register(szMainWindowClass, szMainWindowText))
+  if (!window_register(szMainWindowClass, MAKEINTRESOURCE(ONC_ICON))) {
+    MessageBox(NULL, "Program failed to start due to class registration "
+        "failure.", szMainWindowText, MB_OK | MB_ICONEXCLAMATION);
     return 0;
+  }
 
   app.shell = window_create(szMainWindowClass, szMainWindowTitle);
   if (app.shell == NULL) {
