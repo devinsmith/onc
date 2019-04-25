@@ -33,6 +33,7 @@ int app_init(const char *appName);
 void app_run(void);
 HINSTANCE app_handle(void);
 void app_close(void);
+void app_set_accel(ACCEL *paccel, int num);
 
 #ifdef __cplusplus
 }

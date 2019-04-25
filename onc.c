@@ -249,6 +249,17 @@ create_children(struct onc_app *app)
   return 1;
 }
 
+static void set_accelerators(void)
+{
+  ACCEL accel[1];
+
+  accel[0].key = 'Q';
+  accel[0].cmd = IDM_EXIT;
+  accel[0].fVirt = FCONTROL | FVIRTKEY;
+
+  app_set_accel(accel, 1);
+}
+
 int main(int argc, const char *argv[])
 {
   struct onc_app app;
@@ -256,6 +267,8 @@ int main(int argc, const char *argv[])
   if (!app_init(szMainWindowText)) {
     return 1;
   }
+
+  set_accelerators();
 
   if (!window_register(szMainWindowClass, szMainWindowText))
     return 0;

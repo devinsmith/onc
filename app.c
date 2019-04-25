@@ -30,7 +30,7 @@
 
 static HMODULE hRichEdit;
 static HINSTANCE g_hInst;
-static HACCEL hAccelTable;
+static HACCEL hAccelTable = NULL;
 
 static BOOL
 InitWS2(void)
@@ -84,20 +84,26 @@ app_init(const char *appName)
   /* Ensure that the common control DLL is loaded. */
   InitCommonControls();
 
-  hAccelTable = LoadAccelerators(g_hInst, MAKEINTRESOURCE(IDACCEL));
-
   return 1;
+}
+
+void
+app_set_accel(ACCEL *paccel, int num)
+{
+  hAccelTable = CreateAcceleratorTable(paccel, num);
 }
 
 void app_run(void)
 {
   MSG msg;
 
-  while (GetMessage(&msg,NULL,0,0)) {
-    if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
-      TranslateMessage(&msg);
-      DispatchMessage(&msg);
+  while (GetMessage(&msg, NULL, 0, 0)) {
+    if (hAccelTable != NULL) {
+      if (TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        continue;
     }
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
   }
 }
 
@@ -106,5 +112,8 @@ app_close(void)
 {
   WSACleanup();
   FreeLibrary(hRichEdit);
+  if (hAccelTable != NULL) {
+    DestroyAcceleratorTable(hAccelTable);
+  }
 }
 
