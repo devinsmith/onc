@@ -26,8 +26,6 @@
 
 #include "app.h"
 
-#include "opennakenres.h" // XXX : shouldn't be here.
-
 static HMODULE hRichEdit;
 static HINSTANCE g_hInst;
 static HACCEL hAccelTable = NULL;
