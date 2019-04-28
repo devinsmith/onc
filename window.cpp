@@ -43,7 +43,7 @@ AdjustWindowSize(window *wnd)
   int left_pad, right_pad;
   int width;
   int max_height;
-  int i;
+  size_t i;
   int padding = 2;
   int start = 0;
 
@@ -123,7 +123,7 @@ window_input_create(window *parent)
 {
   window *ret;
 
-  ret = calloc(1, sizeof(window));
+  ret = (window *)calloc(1, sizeof(window));
 
   ret->win = CreateWindowEx(
       WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR,
@@ -156,7 +156,7 @@ window_multi_create(window *parent)
 {
   window *ret;
 
-  ret = calloc(1, sizeof(window));
+  ret = (window *)calloc(1, sizeof(window));
 
   ret->win = CreateWindowEx(
       WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR,
@@ -246,7 +246,7 @@ window *window_create(const char *className, const char *title)
 {
   window *ret;
 
-  ret = calloc(1, sizeof(window));
+  ret = (window *)calloc(1, sizeof(window));
 
   ret->win = CreateWindow(className, title,
     WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_CLIPSIBLINGS |
@@ -266,7 +266,7 @@ window *window_create(const char *className, const char *title)
 
 void window_show(window *wnd)
 {
-  int i;
+  size_t i;
 
   ShowWindow(wnd->win, SW_SHOW);
   UpdateWindow(wnd->win);
@@ -284,7 +284,7 @@ void window_add_child(window *parent, window *child, int expand)
 {
   window **children;
 
-  children = realloc(parent->children, sizeof(window *) *
+  children = (window **)realloc(parent->children, sizeof(window *) *
       (parent->n_children + 1));
 
   child->expand = expand; // Poor layout.

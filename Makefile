@@ -2,8 +2,8 @@
 
 .PHONY: all clean
 
-C_SRCS = about.c app.c cfg.c onc.c network.c newdlg.c prop.c window.c
-CXX_SRCS =
+C_SRCS = about.c app.c cfg.c network.c newdlg.c prop.c
+CXX_SRCS = onc.cpp window.cpp
 
 OBJS = $(C_SRCS:.c=.o) opennakenres.o $(CXX_SRCS:.cpp=.o)
 DEPS = $(C_SRCS:.c=.d) $(CXX_SRCS:.cpp=.d)
@@ -24,7 +24,7 @@ EXE = onc.exe
 all: $(EXE)
 
 $(EXE): $(OBJS)
-	$(CXX) -mwindows $(CFLAGS) -o $(EXE) $(OBJS) $(DEP_LFLAGS) $(DEP_LIBS)
+	$(CXX) -mwindows -static $(CFLAGS) -o $(EXE) $(OBJS) $(DEP_LFLAGS) $(DEP_LIBS)
 
 .cpp.o:
 	$(CXX) $(CFLAGS) $(DEP_INCLUDES) -MMD -MP -MT $@ -o $@ -c $<
