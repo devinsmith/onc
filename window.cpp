@@ -37,17 +37,16 @@
 static WNDPROC oldedit; // Move to edit.c ?
 
 void
-AdjustWindowSize(window *wnd)
+MainWindow::AdjustWindowSize()
 {
   RECT r;
   int left_pad, right_pad;
   int width;
   int max_height;
-  size_t i;
   int padding = 2;
   int start = 0;
 
-  GetClientRect(wnd->win, &r);
+  GetClientRect(win, &r);
 
   left_pad = 5;
   right_pad = 5;
@@ -57,46 +56,44 @@ AdjustWindowSize(window *wnd)
   width -= left_pad;
   width -= right_pad;
 
-  for (i = 0; i < wnd->n_children; i++) {
-    window *child = wnd->children[i];
+  WindowListElement *ptr;
 
-    if (child->expand != EXPAND_Y) {
-      child->height = 24;
+  for (ptr = _wlist; ptr != NULL; ptr = ptr->next) {
+    Window *child = ptr->wnd;
+
+    if (ptr->expand != EXPAND_Y) {
+      child->SetHeight(24);
       max_height -= 24;
     }
     max_height -= padding; // Padding between elements.
   }
 
-  for (i = 0; i < wnd->n_children; i++) {
-    window *child = wnd->children[i];
+  for (ptr = _wlist; ptr != NULL; ptr = ptr->next) {
+    Window *child = ptr->wnd;
 
-    if (child->expand == EXPAND_Y) {
-      child->height = max_height;
+    if (ptr->expand == EXPAND_Y) {
+      child->SetHeight(max_height);
     }
-    SetWindowPos(child->win, NULL, r.left + left_pad, start,
-      width, child->height, SWP_NOZORDER);
+    SetWindowPos(child->GetHWND(), NULL, r.left + left_pad, start,
+      width, child->GetHeight(), SWP_NOZORDER);
 
-    start += child->height + padding;
+    start += child->GetHeight() + padding;
   }
 }
 
-static LRESULT CALLBACK
-EditWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK
+EditWindow::WndProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-  window *wnd;
-
-  wnd = (window *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-
   switch (message) {
   case WM_CHAR:
     if (wParam == VK_RETURN) {
-      if (wnd->action_cb != NULL) {
-        wnd->action_cb(wnd, wnd->action_extra);
+      if (action_cb != NULL) {
+        action_cb(this, action_extra);
       }
     }
   }
 
-  return CallWindowProc(oldedit, hwnd, message, wParam, lParam);
+  return CallWindowProc(oldedit, win, message, wParam, lParam);
 }
 
 static void SetupEditFont(HWND hWnd)
@@ -118,137 +115,67 @@ static void SetupEditFont(HWND hWnd)
     MessageBox(NULL, "SetupEditFont", "Circuit", MB_OK);
 }
 
-window *
-window_input_create(window *parent)
+LRESULT CALLBACK
+MainWindow::WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-  window *ret;
-
-  ret = (window *)calloc(1, sizeof(window));
-
-  ret->win = CreateWindowEx(
-      WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR,
-      "Richedit", NULL, WS_BORDER | WS_CHILD | WS_GROUP | WS_TABSTOP |
-      ES_LEFT | ES_AUTOHSCROLL,
-      0, 0,
-      0, 0,
-      parent->win,
-      NULL,
-      app_handle(),
-      NULL);
-
-  if (ret->win == NULL)
-    return NULL;
-
-  // Since we can't capture WM_CREATE on the richedit control,
-  // we'll set the userdata here so it'll always be available.
-  SetWindowLongPtr(ret->win, GWLP_USERDATA, (LONG_PTR)ret);
-  oldedit = (WNDPROC)SetWindowLongPtr(ret->win, GWLP_WNDPROC,
-      (LONG_PTR)EditWndProc);
-
-  SendMessage(ret->win, EM_SETBKGNDCOLOR, FALSE, RGB(0, 0, 0));
-  SetupEditFont(ret->win);
-
-  return ret;
-}
-
-window *
-window_multi_create(window *parent)
-{
-  window *ret;
-
-  ret = (window *)calloc(1, sizeof(window));
-
-  ret->win = CreateWindowEx(
-      WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR,
-      TEXT("Richedit"), NULL, WS_BORDER | WS_CHILD | WS_GROUP |
-      WS_TABSTOP | ES_LEFT | ES_MULTILINE | WS_VSCROLL | ES_READONLY |
-      ES_AUTOVSCROLL,
-      0, 0,
-      0, 0,
-      parent->win,
-      NULL,
-      app_handle(),
-      NULL);
-
-  if (ret->win == NULL)
-    return NULL;
-
-  SendMessage(ret->win, EM_SETBKGNDCOLOR, FALSE, RGB(0, 0, 0));
-  SetupEditFont(ret->win);
-
-  return ret;
-}
-
-static LRESULT CALLBACK
-MainWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
-{
-  window *wnd;
+  MainWindow *wnd;
   CREATESTRUCT *lpcs;
 
-  wnd = (window *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+  wnd = (MainWindow *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+  if (wnd) {
+    return wnd->WndProc(msg, wParam, lParam);
+  } else {
+    if (msg == WM_CREATE) {
+      lpcs = (CREATESTRUCT*)lParam;
+      wnd = (MainWindow *)lpcs->lpCreateParams;
+      SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)wnd);
 
+      wnd->win = hwnd;
+      return wnd->WndProc(msg, wParam, lParam);
+    }
+    return DefWindowProc(hwnd, msg, wParam, lParam);
+  }
+}
+
+LRESULT CALLBACK
+MainWindow::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
+{
   switch (msg) {
-  case WM_CREATE:
-    lpcs = (CREATESTRUCT*)lParam;
-    wnd = (window *)lpcs->lpCreateParams;
-    SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)wnd);
-
-    wnd->win = hwnd;
-    break;
   case WM_SIZE:
-    AdjustWindowSize(wnd);
+    AdjustWindowSize();
     break;
   case WM_COMMAND:
-    if (wnd->menu_cb != NULL) {
-      wnd->menu_cb(wnd, (int)(LOWORD(wParam)));
+    if (menu_cb != NULL) {
+      menu_cb(this, (int)(LOWORD(wParam)));
     }
     break;
   case WM_DESTROY:
     PostQuitMessage(0);
     break;
   default:
-    return DefWindowProc(hwnd, msg, wParam, lParam);
+    return DefWindowProc(win, msg, wParam, lParam);
   }
   return 0;
 }
 
-int window_register(const char *classname, const char *icon)
+Window::Window(Window *parent, const char *className) : win{NULL},
+  className_{className}, height{0}, parent_{parent}
 {
-  WNDCLASS wc;
-
-  HINSTANCE hInst = app_handle();
-
-  memset(&wc, 0, sizeof(WNDCLASS));
-  wc.lpfnWndProc = (WNDPROC)MainWndProc;
-  wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wc.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-  wc.hInstance = hInst;
-  wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
-  wc.lpszClassName = classname;
-  wc.lpszMenuName = MAKEINTRESOURCE(IDMAINMENU);
-  wc.hIcon = LoadIcon(hInst, icon);
-  if (!RegisterClass(&wc)) {
-    return 0;
-  }
-
-  return 1;
 }
 
-void window_layout(window *wnd)
+Window::~Window()
 {
-  AdjustWindowSize(wnd);
-
-  // Tell app to repaint itself.
-  InvalidateRect(wnd->win, NULL, TRUE);
 }
 
-window *window_create(const char *className, const char *title)
+void Window::Show(void)
 {
-  window *ret;
+  ShowWindow(win, SW_SHOW);
+  UpdateWindow(win);
+}
 
-  ret = (window *)calloc(1, sizeof(window));
-
-  ret->win = CreateWindow(className, title,
+bool Window::Create(const char *title)
+{
+  win = CreateWindow(className_, title,
     WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_CLIPSIBLINGS |
     WS_CLIPCHILDREN | WS_BORDER | WS_DLGFRAME | WS_OVERLAPPEDWINDOW |
     WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
@@ -256,54 +183,154 @@ window *window_create(const char *className, const char *title)
     0,
     CW_USEDEFAULT,
     0,
-    NULL,
+    parent_ != NULL ? parent_->win : NULL,
     NULL,
     app_handle(),
-    ret);
+    this);
 
-  return ret;
+  if (win != NULL)
+    return true;
+
+  return false;
 }
 
-void window_show(window *wnd)
+void MainWindow::Show(void)
 {
-  size_t i;
+  WindowListElement *ptr;
 
-  ShowWindow(wnd->win, SW_SHOW);
-  UpdateWindow(wnd->win);
+  Window::Show(); // show myself.
 
   // Handle children
-  for (i = 0; i < wnd->n_children; i++) {
-    window *child = wnd->children[i];
+  for (ptr = _wlist; ptr != NULL; ptr = ptr->next) {
+    Window *child = ptr->wnd;
 
-    ShowWindow(child->win, SW_SHOW);
-    UpdateWindow(child->win);
+    child->Show();
   }
 }
 
-void window_add_child(window *parent, window *child, int expand)
+MainWindow::MainWindow(const char *className) : Window(NULL, className), 
+  _wlist{NULL}, _wtail{NULL}, menu_cb{NULL}
 {
-  window **children;
+}
 
-  children = (window **)realloc(parent->children, sizeof(window *) *
-      (parent->n_children + 1));
+MainWindow::~MainWindow()
+{
+}
 
-  child->expand = expand; // Poor layout.
+bool MainWindow::Register(const char *icon)
+{
+  WNDCLASS wc;
 
-  children[parent->n_children] = child;
-  parent->n_children++;
-  parent->children = children;
+  HINSTANCE hInst = app_handle();
+
+  memset(&wc, 0, sizeof(WNDCLASS));
+  wc.lpfnWndProc = (WNDPROC)MainWindow::WndProcStub;
+  wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wc.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+  wc.hInstance = hInst;
+  wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
+  wc.lpszClassName = className_;
+  wc.lpszMenuName = MAKEINTRESOURCE(IDMAINMENU);
+  wc.hIcon = LoadIcon(hInst, icon);
+  if (!RegisterClass(&wc)) {
+    return false;
+  }
+
+  return true;
+}
+
+void MainWindow::add_child(Window *child, int expand)
+{
+  WindowListElement *nw;
+
+  nw = new WindowListElement;
+  nw->wnd = child;
+  nw->expand = expand;
+  nw->next = NULL;
+  nw->prev = NULL;
+
+  // First element.
+  if (_wlist == NULL) {
+    _wlist = _wtail = nw;
+  } else {
+    _wtail->next = nw;
+    nw->prev = _wtail;
+    _wtail = nw;
+  }
+}
+
+void MainWindow::set_menu_cb(void (*menucb)(MainWindow *win, int id))
+{
+  menu_cb = menucb;
+}
+
+void MainWindow::layout(void)
+{
+  AdjustWindowSize();
+
+  // Tell app to repaint itself.
+  InvalidateRect(win, NULL, TRUE);
+}
+
+EditWindow::EditWindow(Window *parent, const char *className, bool multiLine) :
+  Window(parent, className), multiLine_{multiLine}
+{
+}
+
+EditWindow::~EditWindow()
+{
+}
+
+LRESULT CALLBACK
+EditWindow::WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+  EditWindow *wnd;
+
+  wnd = (EditWindow *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+  if (wnd) {
+    return wnd->WndProc(msg, wParam, lParam);
+  }
+  return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+bool EditWindow::Create(const char *title)
+{
+  DWORD style = WS_BORDER | WS_CHILD | WS_GROUP | WS_TABSTOP | ES_LEFT;
+
+  if (multiLine_)
+    style |= ES_MULTILINE | WS_VSCROLL | ES_READONLY | ES_AUTOVSCROLL;
+  else
+    style |= ES_AUTOHSCROLL;
+
+
+  win = CreateWindowEx(
+      WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR,
+      TEXT("Richedit"), NULL, style,
+      0, 0,
+      0, 0,
+      parent_->GetHWND(),
+      NULL,
+      app_handle(),
+      NULL);
+
+  if (!multiLine_) {
+    // Since we can't capture WM_CREATE on the richedit control,
+    // we'll set the userdata here so it'll always be available.
+    SetWindowLongPtr(win, GWLP_USERDATA, (LONG_PTR)this);
+    oldedit = (WNDPROC)SetWindowLongPtr(win, GWLP_WNDPROC,
+      (LONG_PTR)EditWindow::WndProcStub);
+  }
+
+  SendMessage(win, EM_SETBKGNDCOLOR, FALSE, RGB(0, 0, 0));
+  SetupEditFont(win);
+
+  return true;
 }
 
 void
-window_set_action_cb(window *wnd,
-    void (*actioncb)(window *win, void *extra), void *extra)
+EditWindow::set_action_cb(void (*actioncb)(EditWindow *win, void *extra),
+    void *extra)
 {
-  wnd->action_cb = actioncb;
-  wnd->action_extra = extra;
-}
-
-void
-window_set_menu_cb(window *wnd, void (*menucb)(window *win, int id))
-{
-  wnd->menu_cb = menucb;
+  action_cb = actioncb;
+  action_extra = extra;
 }
