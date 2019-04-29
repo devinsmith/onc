@@ -237,14 +237,14 @@ input_action_cb(EditWindow *input, void *extra)
 static int
 create_children(struct onc_app *app)
 {
-  app->display = new EditWindow(app->shell, "RichEdit", true);
-  app->input = new EditWindow(app->shell, "RichEdit", false);
+  app->display = new EditWindow(app->shell, true);
+  app->input = new EditWindow(app->shell, false);
 
   if (app->input == NULL || app->display == NULL)
     return 0;
 
-  app->display->Create(NULL);
-  app->input->Create(NULL);
+  app->display->Create();
+  app->input->Create();
 
   app->input->set_action_cb(input_action_cb, app);
 

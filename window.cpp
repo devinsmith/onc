@@ -173,12 +173,9 @@ void Window::Show(void)
   UpdateWindow(m_hwnd);
 }
 
-bool Window::Create(const char *title)
+bool Window::Create(DWORD exStyle, DWORD style, const char *title)
 {
-  m_hwnd = CreateWindow(className_, title,
-    WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_CLIPSIBLINGS |
-    WS_CLIPCHILDREN | WS_BORDER | WS_DLGFRAME | WS_OVERLAPPEDWINDOW |
-    WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
+  m_hwnd = CreateWindowEx(exStyle, className_, title, style,
     CW_USEDEFAULT,
     0,
     CW_USEDEFAULT,
@@ -239,6 +236,14 @@ bool MainWindow::Register(const char *icon)
   return true;
 }
 
+bool MainWindow::Create(const char *title)
+{
+  return Window::Create(0,
+    WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_CLIPSIBLINGS |
+    WS_CLIPCHILDREN | WS_BORDER | WS_DLGFRAME | WS_OVERLAPPEDWINDOW |
+    WS_MINIMIZEBOX | WS_MAXIMIZEBOX, title);
+}
+
 void MainWindow::add_child(Window *child, int expand)
 {
   WindowListElement *nw;
@@ -272,8 +277,8 @@ void MainWindow::layout(void)
   InvalidateRect(m_hwnd, NULL, TRUE);
 }
 
-EditWindow::EditWindow(Window *parent, const char *className, bool multiLine) :
-  Window(parent, className), multiLine_{multiLine}
+EditWindow::EditWindow(Window *parent, bool multiLine) :
+  Window(parent, "RichEdit"), multiLine_{multiLine}
 {
 }
 
@@ -293,7 +298,7 @@ EditWindow::WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
   return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-bool EditWindow::Create(const char *title)
+bool EditWindow::Create()
 {
   DWORD style = WS_BORDER | WS_CHILD | WS_GROUP | WS_TABSTOP | ES_LEFT;
 
@@ -302,16 +307,8 @@ bool EditWindow::Create(const char *title)
   else
     style |= ES_AUTOHSCROLL;
 
-
-  m_hwnd = CreateWindowEx(
-      WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR,
-      TEXT("Richedit"), NULL, style,
-      0, 0,
-      0, 0,
-      parent_->GetHWND(),
-      NULL,
-      app_handle(),
-      NULL);
+  Window::Create(WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR,
+      style, NULL);
 
   if (!multiLine_) {
     // Since we can't capture WM_CREATE on the richedit control,

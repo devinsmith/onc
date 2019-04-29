@@ -37,7 +37,7 @@ public:
   Window(Window *parent, const char *className);
   virtual ~Window();
   virtual void Show(void);
-  virtual bool Create(const char *title);
+  virtual bool Create(DWORD exStyle, DWORD style, const char *title);
 
   HWND GetHWND() { return m_hwnd; }
   int GetHeight() { return height; }
@@ -55,6 +55,7 @@ public:
   MainWindow(const char *className);
   virtual ~MainWindow();
   virtual void Show(void);
+  bool Create(const char *title);
   bool Register(const char *icon);
   void add_child(Window *child, int expand);
   void layout(void);
@@ -73,10 +74,10 @@ private:
 
 class EditWindow : public Window {
 public:
-  EditWindow(Window *parent, const char *className, bool multiLine);
+  EditWindow(Window *parent, bool multiLine);
   virtual ~EditWindow();
 
-  virtual bool Create(const char *title);
+  virtual bool Create();
 
   void set_action_cb(void (*actioncb)(EditWindow *win, void *extra),
       void *extra);
