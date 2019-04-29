@@ -46,7 +46,7 @@ MainWindow::AdjustWindowSize()
   int padding = 2;
   int start = 0;
 
-  GetClientRect(win, &r);
+  GetClientRect(m_hwnd, &r);
 
   left_pad = 5;
   right_pad = 5;
@@ -93,7 +93,7 @@ EditWindow::WndProc(UINT message, WPARAM wParam, LPARAM lParam)
     }
   }
 
-  return CallWindowProc(oldedit, win, message, wParam, lParam);
+  return CallWindowProc(oldedit, m_hwnd, message, wParam, lParam);
 }
 
 static void SetupEditFont(HWND hWnd)
@@ -130,7 +130,7 @@ MainWindow::WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
       wnd = (MainWindow *)lpcs->lpCreateParams;
       SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)wnd);
 
-      wnd->win = hwnd;
+      wnd->m_hwnd = hwnd;
       return wnd->WndProc(msg, wParam, lParam);
     }
     return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -153,12 +153,12 @@ MainWindow::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
     PostQuitMessage(0);
     break;
   default:
-    return DefWindowProc(win, msg, wParam, lParam);
+    return DefWindowProc(m_hwnd, msg, wParam, lParam);
   }
   return 0;
 }
 
-Window::Window(Window *parent, const char *className) : win{NULL},
+Window::Window(Window *parent, const char *className) : m_hwnd{NULL},
   className_{className}, height{0}, parent_{parent}
 {
 }
@@ -169,13 +169,13 @@ Window::~Window()
 
 void Window::Show(void)
 {
-  ShowWindow(win, SW_SHOW);
-  UpdateWindow(win);
+  ShowWindow(m_hwnd, SW_SHOW);
+  UpdateWindow(m_hwnd);
 }
 
 bool Window::Create(const char *title)
 {
-  win = CreateWindow(className_, title,
+  m_hwnd = CreateWindow(className_, title,
     WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_CLIPSIBLINGS |
     WS_CLIPCHILDREN | WS_BORDER | WS_DLGFRAME | WS_OVERLAPPEDWINDOW |
     WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
@@ -183,12 +183,12 @@ bool Window::Create(const char *title)
     0,
     CW_USEDEFAULT,
     0,
-    parent_ != NULL ? parent_->win : NULL,
+    parent_ != NULL ? parent_->m_hwnd : NULL,
     NULL,
     app_handle(),
     this);
 
-  if (win != NULL)
+  if (m_hwnd != NULL)
     return true;
 
   return false;
@@ -269,7 +269,7 @@ void MainWindow::layout(void)
   AdjustWindowSize();
 
   // Tell app to repaint itself.
-  InvalidateRect(win, NULL, TRUE);
+  InvalidateRect(m_hwnd, NULL, TRUE);
 }
 
 EditWindow::EditWindow(Window *parent, const char *className, bool multiLine) :
@@ -303,7 +303,7 @@ bool EditWindow::Create(const char *title)
     style |= ES_AUTOHSCROLL;
 
 
-  win = CreateWindowEx(
+  m_hwnd = CreateWindowEx(
       WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR,
       TEXT("Richedit"), NULL, style,
       0, 0,
@@ -316,13 +316,13 @@ bool EditWindow::Create(const char *title)
   if (!multiLine_) {
     // Since we can't capture WM_CREATE on the richedit control,
     // we'll set the userdata here so it'll always be available.
-    SetWindowLongPtr(win, GWLP_USERDATA, (LONG_PTR)this);
-    oldedit = (WNDPROC)SetWindowLongPtr(win, GWLP_WNDPROC,
+    SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR)this);
+    oldedit = (WNDPROC)SetWindowLongPtr(m_hwnd, GWLP_WNDPROC,
       (LONG_PTR)EditWindow::WndProcStub);
   }
 
-  SendMessage(win, EM_SETBKGNDCOLOR, FALSE, RGB(0, 0, 0));
-  SetupEditFont(win);
+  SendMessage(m_hwnd, EM_SETBKGNDCOLOR, FALSE, RGB(0, 0, 0));
+  SetupEditFont(m_hwnd);
 
   return true;
 }

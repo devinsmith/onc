@@ -39,11 +39,11 @@ public:
   virtual void Show(void);
   virtual bool Create(const char *title);
 
-  HWND GetHWND() { return win; }
+  HWND GetHWND() { return m_hwnd; }
   int GetHeight() { return height; }
   void SetHeight(int h) { height = h; }
 protected:
-  HWND win;
+  HWND m_hwnd;
   const char *className_;
 
   int height;
@@ -90,7 +90,5 @@ private:
   void (*action_cb)(EditWindow *win, void *extra);
   void *action_extra;
 };
-
-
 
 #endif /* XPWINDOW_H */
