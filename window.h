@@ -23,47 +23,73 @@
 #ifndef XPWINDOW_H
 #define XPWINDOW_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-struct window;
-typedef struct window window;
+struct WindowListElement {
+  class Window *wnd;
+  int expand;
+  WindowListElement *next, *prev;
+};
 
 #define EXPAND_Y -1
 #define EXPAND_X -2
 
-struct window {
-  HWND win;
+class Window {
+public:
+  Window(Window *parent, const char *className);
+  virtual ~Window();
+  virtual void Show(void);
+  virtual bool Create(DWORD exStyle, DWORD style, const char *title);
 
-  int expand;
+  HWND GetHWND() { return m_hwnd; }
+  int GetHeight() { return height; }
+  void SetHeight(int h) { height = h; }
+protected:
+  HWND m_hwnd;
+  const char *className_;
+
   int height;
-
-  void (*action_cb)(window *win, void *extra);
-  void *action_extra;
-
-  void (*menu_cb)(window *win, int id);
-
-  // Children
-  size_t n_children;
-  window **children;
+  Window *parent_;
 };
 
+class MainWindow : public Window {
+public:
+  MainWindow(const char *className);
+  virtual ~MainWindow();
+  virtual void Show(void);
+  bool Create(const char *title);
+  bool Register(const char *icon);
+  void add_child(Window *child, int expand);
+  void layout(void);
+  void set_menu_cb(void (*menucb)(MainWindow *win, int id));
+protected:
+  static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT msg,
+      WPARAM wParam, LPARAM lParam);
+  LRESULT WndProc(UINT msg, WPARAM wParam, LPARAM lParam);
+private:
+  void AdjustWindowSize();
 
-int window_register(const char *className, const char *icon);
+  WindowListElement *_wlist, *_wtail;
 
-void window_show(window *wnd);
-window *window_create(const char *className, const char *title);
-window *window_input_create(window *parent);
-window *window_multi_create(window *parent);
-void window_layout(window *wnd);
-void window_add_child(window *parent, window *child, int expand);
-void window_set_menu_cb(window *wnd, void (*menucb)(window *win, int id));
-void window_set_action_cb(window *wnd,
-    void (*actioncb)(window *win, void *extra), void *extra);
+  void (*menu_cb)(MainWindow *win, int id);
+};
 
-#ifdef __cplusplus
-}
-#endif
+class EditWindow : public Window {
+public:
+  EditWindow(Window *parent, bool multiLine);
+  virtual ~EditWindow();
+
+  virtual bool Create();
+
+  void set_action_cb(void (*actioncb)(EditWindow *win, void *extra),
+      void *extra);
+protected:
+  static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT msg,
+      WPARAM wParam, LPARAM lParam);
+  LRESULT WndProc(UINT msg, WPARAM wParam, LPARAM lParam);
+private:
+  bool multiLine_;
+
+  void (*action_cb)(EditWindow *win, void *extra);
+  void *action_extra;
+};
 
 #endif /* XPWINDOW_H */
