@@ -38,14 +38,15 @@ xp_font_init(void)
   SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS),
     &ncm, 0);
 
-  strncpy(g_system_font.faceName, ncm.lfMenuFont.lfFaceName,
-      sizeof(g_system_font.faceName) - 1);
-  g_system_font.faceName[sizeof(g_system_font.faceName) - 1] = '\0';
-
-  // Convert logical height to point size.
   hDC = CreateCompatibleDC(NULL);
-  g_system_font.height = MulDiv(-ncm.lfMenuFont.lfHeight, 72,
+  g_system_font.ptSize = MulDiv(-ncm.lfMenuFont.lfHeight, 72,
       GetDeviceCaps(hDC, LOGPIXELSY));
+  g_system_font.handle = CreateFontIndirect(&ncm.lfMenuFont);
+  SelectObject(hdc, g_system_font.handle);
+  GetTextMetrics(hdc, &g_system_font.metrics);
+
+  GetTextFaceA(hdc, sizeof(g_system_font.faceName), g_system_font.faceName);
+
   DeleteDC(hDC);
 }
 

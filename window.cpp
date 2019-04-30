@@ -111,7 +111,7 @@ static void SetupEditFont(HWND hWnd)
   fmt.dwMask = CFM_COLOR | CFM_FACE | CFM_SIZE | CFM_BOLD;
   fmt.crTextColor = RGB(200, 200, 200); // Light gray.
   strcpy(fmt.szFaceName, default_font->faceName);
-  fmt.yHeight = default_font->height * 20;
+  fmt.yHeight = default_font->ptSize * 20;
 
   if (SendMessage(hWnd, EM_SETCHARFORMAT, SCF_ALL, (LPARAM) &fmt) == 0)
     MessageBox(NULL, "SetupEditFont", "Circuit", MB_OK);

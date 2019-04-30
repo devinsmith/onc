@@ -23,13 +23,18 @@
 #ifndef XPFONT_H
 #define XPFONT_H
 
+#include <windows.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct xpFont {
+  HFONT handle;
+  TEXTMETRICS metrics;
+
+  int ptSize;
   char faceName[64];
-  int height;
 };
 
 void xp_font_init(void);
