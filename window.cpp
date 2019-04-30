@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include "app.h"
+#include "font.h"
 #include "network.h"
 #include "opennakenres.h"
 #include "window.h"
@@ -99,6 +100,7 @@ EditWindow::WndProc(UINT message, WPARAM wParam, LPARAM lParam)
 static void SetupEditFont(HWND hWnd)
 {
   CHARFORMAT fmt;
+  const struct xpFont *default_font = get_default_font();
 
   fmt.cbSize = sizeof(CHARFORMAT);
 
@@ -108,8 +110,8 @@ static void SetupEditFont(HWND hWnd)
   fmt.dwEffects = 0;
   fmt.dwMask = CFM_COLOR | CFM_FACE | CFM_SIZE | CFM_BOLD;
   fmt.crTextColor = RGB(200, 200, 200); // Light gray.
-  strcpy(fmt.szFaceName, "Verdana");
-  fmt.yHeight = 165;
+  strcpy(fmt.szFaceName, default_font->faceName);
+  fmt.yHeight = default_font->height * 20;
 
   if (SendMessage(hWnd, EM_SETCHARFORMAT, SCF_ALL, (LPARAM) &fmt) == 0)
     MessageBox(NULL, "SetupEditFont", "Circuit", MB_OK);
