@@ -31,7 +31,7 @@ extern "C" {
 
 struct xpFont {
   HFONT handle;
-  TEXTMETRICS metrics;
+  TEXTMETRIC metrics;
 
   int ptSize;
   char faceName[64];

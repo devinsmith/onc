@@ -42,10 +42,10 @@ xp_font_init(void)
   g_system_font.ptSize = MulDiv(-ncm.lfMenuFont.lfHeight, 72,
       GetDeviceCaps(hDC, LOGPIXELSY));
   g_system_font.handle = CreateFontIndirect(&ncm.lfMenuFont);
-  SelectObject(hdc, g_system_font.handle);
-  GetTextMetrics(hdc, &g_system_font.metrics);
+  SelectObject(hDC, g_system_font.handle);
+  GetTextMetrics(hDC, &g_system_font.metrics);
 
-  GetTextFaceA(hdc, sizeof(g_system_font.faceName), g_system_font.faceName);
+  GetTextFaceA(hDC, sizeof(g_system_font.faceName), g_system_font.faceName);
 
   DeleteDC(hDC);
 }
