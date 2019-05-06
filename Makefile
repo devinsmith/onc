@@ -2,7 +2,7 @@
 
 .PHONY: all clean
 
-C_SRCS = about.c app.c cfg.c network.c newdlg.c prop.c
+C_SRCS = about.c app.c cfg.c font.c network.c newdlg.c prop.c
 CXX_SRCS = onc.cpp window.cpp
 
 OBJS = $(C_SRCS:.c=.o) opennakenres.o $(CXX_SRCS:.cpp=.o)

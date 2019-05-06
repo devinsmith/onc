@@ -25,6 +25,7 @@
 #include <commctrl.h>
 
 #include "app.h"
+#include "font.h"
 
 static HMODULE hRichEdit;
 static HINSTANCE g_hInst;
@@ -81,6 +82,8 @@ app_init(const char *appName)
 
   /* Ensure that the common control DLL is loaded. */
   InitCommonControls();
+
+  xp_font_init();
 
   return 1;
 }
