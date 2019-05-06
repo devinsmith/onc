@@ -34,6 +34,8 @@
 #include "network.h"
 #include "window.h"
 
+namespace XP {
+
 static WNDPROC oldedit; // Move to edit.c ?
 
 void
@@ -332,3 +334,5 @@ EditWindow::set_action_cb(void (*actioncb)(EditWindow *win, void *extra),
   action_cb = actioncb;
   action_extra = extra;
 }
+
+} // End of namespace XP

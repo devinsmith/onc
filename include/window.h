@@ -23,6 +23,8 @@
 #ifndef XPWINDOW_H
 #define XPWINDOW_H
 
+namespace XP {
+
 struct WindowListElement {
   class Window *wnd;
   int expand;
@@ -91,5 +93,7 @@ private:
   void (*action_cb)(EditWindow *win, void *extra);
   void *action_extra;
 };
+
+} // end of namespace XP
 
 #endif /* XPWINDOW_H */

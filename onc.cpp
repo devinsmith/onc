@@ -36,6 +36,8 @@
 #include "prop.h"
 #include "window.h"
 
+using namespace XP;
+
 const char *szMainWindowClass = "OpenNakenClass";
 const char *szMainWindowText = "OpenNaken";
 const char *szMainWindowTitle = "OpenNaken v0.2";
