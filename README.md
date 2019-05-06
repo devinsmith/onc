@@ -18,22 +18,5 @@ mingw32-make
 
 # Code structure
 
-The eventual goal is to seperate certain functionality into a seperate library
-that can be reused with other apps, however this is not possible yet.
-
-```
-Library files:
-  app.c/app.h - handles overall application state.
-  network.c/network.h - async Winsock networking.
-  window.c/window.h - Win32 window helper routines.
-```
-
-```
-App files:
-   about.c - "Help->About" dialog
-   cfg.c - INI configuration.
-   newdlg.c - "File->New" dialog.
-   onc.c - main application
-   opennaken.rc - Win32 resources
-   prop.c - "File->Properties" dialog.
-```
+Library files are in the lib directory. These are supposed to be shared with
+other apps. The main app is in the root directory.
