@@ -32,7 +32,6 @@
 #include "app.h"
 #include "font.h"
 #include "network.h"
-#include "opennakenres.h"
 #include "window.h"
 
 static WNDPROC oldedit; // Move to edit.c ?
@@ -216,7 +215,7 @@ MainWindow::~MainWindow()
 {
 }
 
-bool MainWindow::Register(const char *icon)
+bool MainWindow::Register(const char *icon, const char *menu)
 {
   WNDCLASS wc;
 
@@ -229,7 +228,7 @@ bool MainWindow::Register(const char *icon)
   wc.hInstance = hInst;
   wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
   wc.lpszClassName = className_;
-  wc.lpszMenuName = MAKEINTRESOURCE(IDMAINMENU);
+  wc.lpszMenuName = menu;
   wc.hIcon = LoadIcon(hInst, icon);
   if (!RegisterClass(&wc)) {
     return false;

@@ -56,7 +56,7 @@ public:
   virtual ~MainWindow();
   virtual void Show(void);
   bool Create(const char *title);
-  bool Register(const char *icon);
+  bool Register(const char *icon, const char *menu);
   void add_child(Window *child, int expand);
   void layout(void);
   void set_menu_cb(void (*menucb)(MainWindow *win, int id));

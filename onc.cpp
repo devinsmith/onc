@@ -276,7 +276,8 @@ int main(int argc, const char *argv[])
   set_accelerators();
 
   app.shell = new MainWindow(szMainWindowClass);
-  if (!app.shell->Register(MAKEINTRESOURCE(ONC_ICON))) {
+  if (!app.shell->Register(MAKEINTRESOURCE(ONC_ICON),
+      MAKEINTRESOURCE(IDMAINMENU))) {
     MessageBox(NULL, "Program failed to start due to class registration "
         "failure.", szMainWindowText, MB_OK | MB_ICONEXCLAMATION);
     return -1;
