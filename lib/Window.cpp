@@ -30,13 +30,10 @@
 #include <string.h>
 
 #include "app.h"
-#include "font.h"
 #include "network.h"
-#include "window.h"
+#include "Window.h"
 
 namespace XP {
-
-static WNDPROC oldedit; // Move to edit.c ?
 
 void
 MainWindow::AdjustWindowSize()
@@ -81,41 +78,6 @@ MainWindow::AdjustWindowSize()
 
     start += child->GetHeight() + padding;
   }
-}
-
-LRESULT CALLBACK
-EditWindow::WndProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-  switch (message) {
-  case WM_CHAR:
-    if (wParam == VK_RETURN) {
-      if (action_cb != NULL) {
-        action_cb(this, action_extra);
-      }
-    }
-  }
-
-  return CallWindowProc(oldedit, m_hwnd, message, wParam, lParam);
-}
-
-static void SetupEditFont(HWND hWnd)
-{
-  CHARFORMAT fmt;
-  const struct xpFont *default_font = get_default_font();
-
-  fmt.cbSize = sizeof(CHARFORMAT);
-
-  // Get existing character format.
-  SendMessage(hWnd, EM_GETCHARFORMAT, FALSE, (LPARAM)&fmt);
-
-  fmt.dwEffects = 0;
-  fmt.dwMask = CFM_COLOR | CFM_FACE | CFM_SIZE | CFM_BOLD;
-  fmt.crTextColor = RGB(200, 200, 200); // Light gray.
-  strcpy(fmt.szFaceName, default_font->faceName);
-  fmt.yHeight = default_font->ptSize * 20;
-
-  if (SendMessage(hWnd, EM_SETCHARFORMAT, SCF_ALL, (LPARAM) &fmt) == 0)
-    MessageBox(NULL, "SetupEditFont", "Circuit", MB_OK);
 }
 
 LRESULT CALLBACK
@@ -278,61 +240,6 @@ void MainWindow::layout(void)
 
   // Tell app to repaint itself.
   InvalidateRect(m_hwnd, NULL, TRUE);
-}
-
-EditWindow::EditWindow(Window *parent, bool multiLine) :
-  Window(parent, "RichEdit"), multiLine_{multiLine}
-{
-}
-
-EditWindow::~EditWindow()
-{
-}
-
-LRESULT CALLBACK
-EditWindow::WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-  EditWindow *wnd;
-
-  wnd = (EditWindow *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-  if (wnd) {
-    return wnd->WndProc(msg, wParam, lParam);
-  }
-  return DefWindowProc(hwnd, msg, wParam, lParam);
-}
-
-bool EditWindow::Create()
-{
-  DWORD style = WS_BORDER | WS_CHILD | WS_GROUP | WS_TABSTOP | ES_LEFT;
-
-  if (multiLine_)
-    style |= ES_MULTILINE | WS_VSCROLL | ES_READONLY | ES_AUTOVSCROLL;
-  else
-    style |= ES_AUTOHSCROLL;
-
-  Window::Create(WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR,
-      style, NULL);
-
-  if (!multiLine_) {
-    // Since we can't capture WM_CREATE on the richedit control,
-    // we'll set the userdata here so it'll always be available.
-    SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR)this);
-    oldedit = (WNDPROC)SetWindowLongPtr(m_hwnd, GWLP_WNDPROC,
-      (LONG_PTR)EditWindow::WndProcStub);
-  }
-
-  SendMessage(m_hwnd, EM_SETBKGNDCOLOR, FALSE, RGB(0, 0, 0));
-  SetupEditFont(m_hwnd);
-
-  return true;
-}
-
-void
-EditWindow::set_action_cb(void (*actioncb)(EditWindow *win, void *extra),
-    void *extra)
-{
-  action_cb = actioncb;
-  action_extra = extra;
 }
 
 } // End of namespace XP

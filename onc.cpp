@@ -34,7 +34,8 @@
 #include "newdlg.h"
 #include "onc.h"
 #include "prop.h"
-#include "window.h"
+#include "EditWindow.h"
+#include "Window.h"
 
 using namespace XP;
 
