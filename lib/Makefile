@@ -17,7 +17,7 @@ CXX = g++
 DEP_INCLUDES =
 DEP_LIBS = -lws2_32 -lcomctl32 -lcomdlg32
 
-CFLAGS = -Wall -O2 -I.
+CFLAGS = -Wall -O2 -I. -I../include
 
 LIB = libwinui
 STATIC_LIB = $(LIB).a
@@ -40,7 +40,7 @@ $(EXE): $(OBJS)
 
 clean:
 	del /f $(OBJS) 2>NUL
-	del /f $(EXE) 2>NUL
+	del /f $(STATIC_LIB) 2>NUL
 	del /f $(DEPS) 2>NUL
 
 # Include automatically generated dependency files

@@ -14,7 +14,7 @@ CXX = g++
 # Dependencies
 # On Mingw if using c++ link statically to libraries
 # -static-libgcc -static-libstdc++
-DEP_INCLUDES = -Ilib
+DEP_INCLUDES = -Iinclude
 DEP_LIBS = -Llib -lwinui -lws2_32 -lcomctl32 -lcomdlg32
 
 CFLAGS = -Wall -O2 -I.
