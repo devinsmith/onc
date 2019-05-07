@@ -20,38 +20,35 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef XPWINDOW_H
-#define XPWINDOW_H
+#ifndef XPMAINWINDOW_H
+#define XPMAINWINDOW_H
+
+#include "Window.h"
 
 namespace XP {
 
-struct WindowListElement {
-  class Window *wnd;
-  int expand;
-  WindowListElement *next, *prev;
-};
-
-#define EXPAND_Y -1
-#define EXPAND_X -2
-
-class Window {
+class MainWindow : public Window {
 public:
-  Window(Window *parent, const char *className);
-  virtual ~Window();
+  MainWindow(const char *className);
+  virtual ~MainWindow();
   virtual void Show(void);
-  virtual bool Create(DWORD exStyle, DWORD style, const char *title);
-
-  HWND GetHWND() { return m_hwnd; }
-  int GetHeight() { return height; }
-  void SetHeight(int h) { height = h; }
+  bool Create(const char *title);
+  bool Register(const char *icon, const char *menu);
+  void add_child(Window *child, int expand);
+  void layout(void);
+  void set_menu_cb(void (*menucb)(MainWindow *win, int id));
 protected:
-  HWND m_hwnd;
-  const char *className_;
+  static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT msg,
+      WPARAM wParam, LPARAM lParam);
+  LRESULT WndProc(UINT msg, WPARAM wParam, LPARAM lParam);
+private:
+  void AdjustWindowSize();
 
-  int height;
-  Window *parent_;
+  WindowListElement *_wlist, *_wtail;
+
+  void (*menu_cb)(MainWindow *win, int id);
 };
 
 } // end of namespace XP
 
-#endif /* XPWINDOW_H */
+#endif /* XPMAINWINDOW_H */

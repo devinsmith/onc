@@ -35,6 +35,7 @@
 #include "onc.h"
 #include "prop.h"
 #include "EditWindow.h"
+#include "MainWindow.h"
 #include "Window.h"
 
 using namespace XP;
