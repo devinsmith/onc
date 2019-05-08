@@ -31,4 +31,18 @@
 
 #include "opennakenres.h"
 
+#include "EditWindow.h"
+#include "MainWindow.h"
+
+class OncApp : public XP::MainWindow {
+public:
+  int CreateChildren();
+
+  virtual void OnMenuClick(int id);
+
+public: // Temporarily public
+  XP::EditWindow *m_display;
+  XP::EditWindow *m_input;
+};
+
 #endif /* ONC_H */

@@ -40,29 +40,21 @@
 
 using namespace XP;
 
-const char *szMainWindowClass = "OpenNakenClass";
 const char *szMainWindowText = "OpenNaken";
 const char *szMainWindowTitle = "OpenNaken v0.2";
 
 struct net_ctx net_ctx;
 struct new_dlg new_dlg;
 
-struct onc_app {
-  MainWindow *shell;
-
-  EditWindow *display;
-  EditWindow *input;
-};
-
 static void
 resolve_done(struct net_ctx *ctx, int error, void *extra)
 {
-  struct onc_app *app = (struct onc_app *)extra;
+  OncApp *app = (OncApp *)extra;
 
-  SendMessage(app->display->GetHWND(), EM_REPLACESEL, FALSE,
+  SendMessage(app->m_display->GetHWND(), EM_REPLACESEL, FALSE,
       (LPARAM)((LPSTR)"Looking up host..\r\n"));
   if (error) {
-    MessageBox(app->shell->GetHWND(),
+    MessageBox(app->GetHWND(),
         "There was a problem resolving the server "
         "name address you entered. Please make sure that you are connected to "
         "the internet and try again.", szMainWindowText,
@@ -143,37 +135,37 @@ HandleData(HWND hwndDisp, LPSTR lpBuf, int nBytesRead)
   }
 }
 
-static void
-menu_callback(MainWindow *wnd, int id)
+void
+OncApp::OnMenuClick(int id)
 {
   switch (id) {
   case IDM_ABOUT:
-    about_dlg_show(app_handle(), wnd->GetHWND());
+    about_dlg_show(app_handle(), GetHWND());
     break;
   case IDM_NEW:
     new_dlg.hInst = app_handle();
-    new_dlg.parent = wnd->GetHWND();
+    new_dlg.parent = GetHWND();
     new_dlg.net = &net_ctx;
     new_dlg.username[0] = '\0';
 
     new_dlg_show(&new_dlg);
     break;
   case IDM_DISC:
-    if (MessageBox(wnd->GetHWND(), "Are you sure you want to disconnect?",
+    if (MessageBox(GetHWND(), "Are you sure you want to disconnect?",
           "OpenNaken Chat", MB_ICONINFORMATION | MB_YESNO) == IDYES) {
         closesocket(net_ctx.s);
         net_ctx.connected = FALSE;
     }
     break;
   case IDM_PROP:
-    propertydlg(wnd->GetHWND());
+    propertydlg(GetHWND());
     break;
   case IDM_HELP:
-    MessageBox(wnd->GetHWND(), "Help coming soon!", "OpenNaken Chat",
+    MessageBox(GetHWND(), "Help coming soon!", "OpenNaken Chat",
         MB_ICONINFORMATION | MB_OK);
     break;
   case IDM_EXIT:
-    PostMessage(wnd->GetHWND(), WM_CLOSE,0,0);
+    PostMessage(GetHWND(), WM_CLOSE, 0, 0);
     break;
   }
 }
@@ -183,17 +175,17 @@ net_activity(struct net_ctx *ctx, int event, void *extra)
 {
   int nBytesRead;
   char gbufRecv[512];     // the buffer
-  struct onc_app *app = (struct onc_app *)extra;
+  OncApp *app = (OncApp *)extra;
 
   switch (event) {
   case FD_CONNECT:
-    SendMessage(app->display->GetHWND(), EM_REPLACESEL, FALSE, (LPARAM)((LPSTR)"Connected!\r\n"));
+    SendMessage(app->m_display->GetHWND(), EM_REPLACESEL, FALSE, (LPARAM)((LPSTR)"Connected!\r\n"));
     ctx->connected = TRUE;
-    DoStartupTransmit(app->shell);
+    DoStartupTransmit(app);
     break;
 
   case FD_WRITE:
-    SendMessage(app->display->GetHWND(), EM_REPLACESEL, FALSE, (LPARAM)((LPSTR)"Sending data!\r\n"));
+    SendMessage(app->m_display->GetHWND(), EM_REPLACESEL, FALSE, (LPARAM)((LPSTR)"Sending data!\r\n"));
     break;
   case FD_READ:
     nBytesRead = recv(ctx->s,
@@ -203,11 +195,11 @@ net_activity(struct net_ctx *ctx, int event, void *extra)
 
     if (nBytesRead == 0) {
       // Connection has been closed.
-      SendMessage(app->display->GetHWND(), EM_REPLACESEL, FALSE, (LPARAM)((LPSTR)"Your connection has been closed!\r\n"));
+      SendMessage(app->m_display->GetHWND(), EM_REPLACESEL, FALSE, (LPARAM)((LPSTR)"Your connection has been closed!\r\n"));
       break;
     }
     gbufRecv[nBytesRead] = '\0';
-    HandleData(app->display->GetHWND(), gbufRecv, nBytesRead);
+    HandleData(app->m_display->GetHWND(), gbufRecv, nBytesRead);
     break;
   }
 }
@@ -215,7 +207,7 @@ net_activity(struct net_ctx *ctx, int event, void *extra)
 static void
 input_action_cb(EditWindow *input, void *extra)
 {
-  struct onc_app *app = (struct onc_app *)extra;
+  OncApp *app = (OncApp *)extra;
   char textr[256];
   int d;
 
@@ -225,7 +217,7 @@ input_action_cb(EditWindow *input, void *extra)
     wsprintf(textr, "%s \r\n", textr);
     d = send(net_ctx.s, textr, strlen(textr), 0);
     if (d == SOCKET_ERROR) {
-      MessageBox(app->shell->GetHWND(),
+      MessageBox(app->GetHWND(),
         "send() is having a problem, check your connection.",
         "OpenNaken Chat", MB_OK | MB_ICONERROR);
       closesocket(net_ctx.s);
@@ -233,29 +225,9 @@ input_action_cb(EditWindow *input, void *extra)
     }
     return;
   } else {
-    MessageBox(app->shell->GetHWND(), "Please connect to a server first",
+    MessageBox(app->GetHWND(), "Please connect to a server first",
       "OpenNaken Chat", MB_OK | MB_ICONERROR);
   }
-}
-
-static int
-create_children(struct onc_app *app)
-{
-  app->display = new EditWindow(app->shell, true);
-  app->input = new EditWindow(app->shell, false);
-
-  if (app->input == NULL || app->display == NULL)
-    return 0;
-
-  app->display->Create();
-  app->input->Create();
-
-  app->input->set_action_cb(input_action_cb, app);
-
-  app->shell->add_child(app->display, EXPAND_Y);
-  app->shell->add_child(app->input, 0);
-
-  return 1;
 }
 
 static void set_accelerators(void)
@@ -269,41 +241,58 @@ static void set_accelerators(void)
   app_set_accel(accel, 1);
 }
 
+int OncApp::CreateChildren()
+{
+  m_display = new EditWindow(this, true);
+  m_input = new EditWindow(this, false);
+
+  if (m_input == NULL || m_display == NULL)
+    return 0;
+
+  m_display->Create();
+  m_input->Create();
+
+  m_input->set_action_cb(input_action_cb, this);
+
+  add_child(m_display, EXPAND_Y);
+  add_child(m_input, 0);
+
+  return 1;
+}
+
 int main(int argc, const char *argv[])
 {
-  struct onc_app app;
-
   if (!app_init(szMainWindowText)) {
     return 1;
   }
 
   set_accelerators();
 
-  app.shell = new MainWindow(szMainWindowClass);
-  if (!app.shell->Register(MAKEINTRESOURCE(ONC_ICON),
+  OncApp app;
+
+  if (!app.Register(MAKEINTRESOURCE(ONC_ICON),
       MAKEINTRESOURCE(IDMAINMENU))) {
     MessageBox(NULL, "Program failed to start due to class registration "
         "failure.", szMainWindowText, MB_OK | MB_ICONEXCLAMATION);
     return -1;
   }
 
-  if (!app.shell->Create(szMainWindowTitle)) {
+  if (!app.Create(szMainWindowTitle)) {
     MessageBox(NULL, "Error creating main window",
         szMainWindowText, MB_OK);
     return -1;
   }
 
   // Initialize network layer.
-  net_init(&net_ctx, app.shell->GetHWND());
+  net_init(&net_ctx, app.GetHWND());
   // Register callbacks
   net_resolv_cb(&net_ctx, resolve_done, &app);
   net_activity_cb(&net_ctx, net_activity, &app);
 
-  create_children(&app);
-  app.shell->set_menu_cb(menu_callback);
-  app.shell->layout();
+  app.CreateChildren();
+  app.layout();
 
-  app.shell->Show();
+  app.Show();
 
   app_run();
   app_close();

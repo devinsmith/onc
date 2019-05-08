@@ -29,14 +29,14 @@ namespace XP {
 
 class MainWindow : public Window {
 public:
-  MainWindow(const char *className);
+  MainWindow();
   virtual ~MainWindow();
   virtual void Show(void);
+  virtual void OnMenuClick(int id) { /* do nothing */ }
   bool Create(const char *title);
   bool Register(const char *icon, const char *menu);
   void add_child(Window *child, int expand);
   void layout(void);
-  void set_menu_cb(void (*menucb)(MainWindow *win, int id));
 protected:
   static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT msg,
       WPARAM wParam, LPARAM lParam);
@@ -45,8 +45,6 @@ private:
   void AdjustWindowSize();
 
   WindowListElement *_wlist, *_wtail;
-
-  void (*menu_cb)(MainWindow *win, int id);
 };
 
 } // end of namespace XP

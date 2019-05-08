@@ -108,9 +108,7 @@ MainWindow::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
     AdjustWindowSize();
     break;
   case WM_COMMAND:
-    if (menu_cb != NULL) {
-      menu_cb(this, (int)(LOWORD(wParam)));
-    }
+    OnMenuClick((int)(LOWORD(wParam)));
     break;
   case WM_DESTROY:
     PostQuitMessage(0);
@@ -135,8 +133,8 @@ void MainWindow::Show(void)
   }
 }
 
-MainWindow::MainWindow(const char *className) : Window(NULL, className), 
-  _wlist{NULL}, _wtail{NULL}, menu_cb{NULL}
+MainWindow::MainWindow() : Window(NULL, "xpMainWndClass"),
+  _wlist{NULL}, _wtail{NULL}
 {
 }
 
@@ -192,11 +190,6 @@ void MainWindow::add_child(Window *child, int expand)
     nw->prev = _wtail;
     _wtail = nw;
   }
-}
-
-void MainWindow::set_menu_cb(void (*menucb)(MainWindow *win, int id))
-{
-  menu_cb = menucb;
 }
 
 void MainWindow::layout(void)
