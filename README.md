@@ -16,6 +16,13 @@ set PATH=%PATH%;d:\mingw64\bin
 mingw32-make
 ```
 
+On Linux you can cross compile using the mingw-w64 compiler. Under Ubuntu you
+need to install the mingw-w64 package.
+
+```
+sudo apt-get install mingw-w64
+```
+
 # Code structure
 
 Library files are in the lib directory. These are supposed to be shared with
