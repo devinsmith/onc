@@ -10,6 +10,22 @@ DEPS = $(C_SRCS:.c=.d) $(CXX_SRCS:.cpp=.d)
 
 CC = gcc
 CXX = g++
+RM = del /f 2>NUL
+
+# if no platform defined.
+ifeq ($(PLATFORM),)
+ifeq ($(OS),Windows_NT)
+  HOST=
+  CC = gcc
+  CXX = g++
+else
+  HOST=
+  RM = rm -f
+  CC = x86_64-w64-mingw32-gcc
+  CXX = x86_64-w64-mingw32-g++
+endif
+endif
+
 
 # Dependencies
 # On Mingw if using c++ link statically to libraries
@@ -25,7 +41,7 @@ STATIC_LIB = $(LIB).a
 all: $(STATIC_LIB)
 
 $(STATIC_LIB): $(OBJS)
-	del /f $(STATIC_LIB) 2>NUL
+	$(RM) $(STATIC_LIB)
 	ar cru $(STATIC_LIB) $(OBJS)
 	ranlib $(STATIC_LIB)
 
@@ -39,9 +55,9 @@ $(EXE): $(OBJS)
 	$(CC) $(CFLAGS) $(DEP_INCLUDES) -MMD -MP -MT $@ -o $@ -c $<
 
 clean:
-	del /f $(OBJS) 2>NUL
-	del /f $(STATIC_LIB) 2>NUL
-	del /f $(DEPS) 2>NUL
+	$(RM) $(OBJS)
+	$(RM) $(STATIC_LIB)
+	$(RM) $(DEPS)
 
 # Include automatically generated dependency files
 -include $(DEPS)
