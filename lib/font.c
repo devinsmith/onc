@@ -39,9 +39,9 @@ xp_font_init(void)
     &ncm, 0);
 
   hDC = CreateCompatibleDC(NULL);
-  g_system_font.ptSize = MulDiv(-ncm.lfMenuFont.lfHeight, 72,
+  g_system_font.ptSize = MulDiv(-ncm.lfMessageFont.lfHeight, 72,
       GetDeviceCaps(hDC, LOGPIXELSY));
-  g_system_font.handle = CreateFontIndirect(&ncm.lfMenuFont);
+  g_system_font.handle = CreateFontIndirect(&ncm.lfMessageFont);
   SelectObject(hDC, g_system_font.handle);
   GetTextMetrics(hDC, &g_system_font.metrics);
 
