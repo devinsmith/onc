@@ -34,8 +34,8 @@
 
 namespace XP {
 
-Window::Window(Window *parent, const char *className) : m_hwnd{NULL},
-  className_{className}, height{0}, parent_{parent}
+Window::Window(Window *parent, const char *className, int w, int h) :
+  m_hwnd{NULL}, className_{className}, m_width{w}, m_height{h}, parent_{parent}
 {
 }
 
@@ -54,8 +54,8 @@ bool Window::Create(DWORD exStyle, DWORD style, const char *title)
   m_hwnd = CreateWindowEx(exStyle, className_, title, style,
     CW_USEDEFAULT,
     0,
-    CW_USEDEFAULT,
-    0,
+    m_width,
+    m_height,
     parent_ != NULL ? parent_->m_hwnd : NULL,
     NULL,
     app_handle(),

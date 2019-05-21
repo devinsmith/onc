@@ -36,19 +36,20 @@ struct WindowListElement {
 
 class Window {
 public:
-  Window(Window *parent, const char *className);
+  Window(Window *parent, const char *className, int w, int h);
   virtual ~Window();
   virtual void Show(void);
   virtual bool Create(DWORD exStyle, DWORD style, const char *title);
 
   HWND GetHWND() { return m_hwnd; }
-  int GetHeight() { return height; }
-  void SetHeight(int h) { height = h; }
+  int GetHeight() { return m_height; }
+  void SetHeight(int h) { m_height = h; }
 protected:
   HWND m_hwnd;
   const char *className_;
 
-  int height;
+  int m_width;
+  int m_height;
   Window *parent_;
 };
 

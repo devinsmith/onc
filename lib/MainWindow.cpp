@@ -133,7 +133,8 @@ void MainWindow::Show(void)
   }
 }
 
-MainWindow::MainWindow() : Window(NULL, "xpMainWndClass"),
+MainWindow::MainWindow() :
+  Window(NULL, "xpMainWndClass", CW_USEDEFAULT, CW_USEDEFAULT),
   _wlist{NULL}, _wtail{NULL}
 {
 }

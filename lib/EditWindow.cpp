@@ -73,7 +73,7 @@ static void SetupEditFont(HWND hWnd)
 }
 
 EditWindow::EditWindow(Window *parent, bool multiLine) :
-  Window(parent, "RichEdit"), multiLine_{multiLine}
+  Window(parent, "RichEdit", 0, 0), multiLine_{multiLine}
 {
 }
 
