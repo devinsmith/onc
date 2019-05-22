@@ -20,39 +20,30 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef XPWINDOW_H
-#define XPWINDOW_H
+#ifndef XP_DIALOGWINDOW_H
+#define XP_DIALOGWINDOW_H
+
+#include "CompositeFrame.h"
 
 namespace XP {
 
-struct WindowListElement {
-  class Window *wnd;
-  int expand;
-  WindowListElement *next, *prev;
-};
-
-#define EXPAND_Y -1
-#define EXPAND_X -2
-
-class Window {
-public:
-  Window(const Window *parent, const char *className, int w, int h);
-  virtual ~Window();
-  virtual void Show(void);
-  virtual bool Create(DWORD exStyle, DWORD style, const char *title);
-
-  HWND GetHWND() const { return m_hwnd; }
-  int GetHeight() { return m_height; }
-  void SetHeight(int h) { m_height = h; }
+class DialogWindow : public CompositeFrame {
 protected:
-  HWND m_hwnd;
-  const char *className_;
+  static bool init_;
 
-  int m_width;
-  int m_height;
-  const Window *parent_;
+public:
+  DialogWindow(const Window *parent);
+  virtual ~DialogWindow();
+  bool Create(const char *title, int x, int y);
+  void Run();
+protected:
+  static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT msg,
+      WPARAM wParam, LPARAM lParam);
+  LRESULT WndProc(UINT msg, WPARAM wParam, LPARAM lParam);
+private:
+  void Init();
 };
 
 } // end of namespace XP
 
-#endif /* XPWINDOW_H */
+#endif /* XP_DIALOGWINDOW_H */
