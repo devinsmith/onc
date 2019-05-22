@@ -29,7 +29,7 @@ namespace XP {
 
 class CompositeFrame : public Window {
 public:
-  CompositeFrame();
+  CompositeFrame(const Window *parent, const char *className);
   virtual ~CompositeFrame();
   virtual void Show(void);
   void add_child(Window *child, int expand);

@@ -74,7 +74,7 @@ MainWindow::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
   return 0;
 }
 
-MainWindow::MainWindow() : CompositeFrame{}
+MainWindow::MainWindow() : CompositeFrame(NULL, "xpMainWndClass")
 {
 }
 

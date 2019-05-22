@@ -36,7 +36,7 @@ struct WindowListElement {
 
 class Window {
 public:
-  Window(Window *parent, const char *className, int w, int h);
+  Window(const Window *parent, const char *className, int w, int h);
   virtual ~Window();
   virtual void Show(void);
   virtual bool Create(DWORD exStyle, DWORD style, const char *title);
@@ -50,7 +50,7 @@ protected:
 
   int m_width;
   int m_height;
-  Window *parent_;
+  const Window *parent_;
 };
 
 } // end of namespace XP

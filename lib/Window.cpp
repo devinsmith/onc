@@ -34,7 +34,7 @@
 
 namespace XP {
 
-Window::Window(Window *parent, const char *className, int w, int h) :
+Window::Window(const Window *parent, const char *className, int w, int h) :
   m_hwnd{NULL}, className_{className}, m_width{w}, m_height{h}, parent_{parent}
 {
 }

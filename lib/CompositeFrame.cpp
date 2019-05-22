@@ -92,8 +92,8 @@ void CompositeFrame::Show(void)
   }
 }
 
-CompositeFrame::CompositeFrame() :
-  Window(NULL, "xpMainWndClass", CW_USEDEFAULT, CW_USEDEFAULT),
+CompositeFrame::CompositeFrame(const Window *parent, const char *className) :
+  Window(parent, className, CW_USEDEFAULT, CW_USEDEFAULT),
   _wlist{NULL}, _wtail{NULL}
 {
 }
