@@ -20,26 +20,26 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef XPMAINWINDOW_H
-#define XPMAINWINDOW_H
+#ifndef XP_COMPOSITEFRAME_H
+#define XP_COMPOSITEFRAME_H
 
-#include "CompositeFrame.h"
+#include "Window.h"
 
 namespace XP {
 
-class MainWindow : public CompositeFrame {
+class CompositeFrame : public Window {
 public:
-  MainWindow();
-  virtual ~MainWindow();
-  virtual void OnMenuClick(int id) { /* do nothing */ }
-  bool Create(const char *title);
-  bool Register(const char *icon, const char *menu);
-protected:
-  static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT msg,
-      WPARAM wParam, LPARAM lParam);
-  LRESULT WndProc(UINT msg, WPARAM wParam, LPARAM lParam);
+  CompositeFrame();
+  virtual ~CompositeFrame();
+  virtual void Show(void);
+  void add_child(Window *child, int expand);
+  void layout(void);
+private:
+  void AdjustWindowSize();
+
+  WindowListElement *_wlist, *_wtail;
 };
 
 } // end of namespace XP
 
-#endif /* XPMAINWINDOW_H */
+#endif /* XP_COMPOSITEFRAME_H */

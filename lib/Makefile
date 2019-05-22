@@ -3,7 +3,7 @@
 .PHONY: all clean
 
 C_SRCS = app.c font.c network.c
-CXX_SRCS = EditWindow.cpp MainWindow.cpp Window.cpp
+CXX_SRCS = CompositeFrame.cpp EditWindow.cpp MainWindow.cpp Window.cpp
 
 OBJS = $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o)
 DEPS = $(C_SRCS:.c=.d) $(CXX_SRCS:.cpp=.d)

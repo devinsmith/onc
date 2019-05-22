@@ -33,51 +33,6 @@
 
 namespace XP {
 
-void
-MainWindow::AdjustWindowSize()
-{
-  RECT r;
-  int left_pad, right_pad;
-  int width;
-  int max_height;
-  int padding = 2;
-  int start = 0;
-
-  GetClientRect(m_hwnd, &r);
-
-  left_pad = 5;
-  right_pad = 5;
-
-  max_height = r.bottom - r.top;
-  width = (r.right - r.left);
-  width -= left_pad;
-  width -= right_pad;
-
-  WindowListElement *ptr;
-
-  for (ptr = _wlist; ptr != NULL; ptr = ptr->next) {
-    Window *child = ptr->wnd;
-
-    if (ptr->expand != EXPAND_Y) {
-      child->SetHeight(24);
-      max_height -= 24;
-    }
-    max_height -= padding; // Padding between elements.
-  }
-
-  for (ptr = _wlist; ptr != NULL; ptr = ptr->next) {
-    Window *child = ptr->wnd;
-
-    if (ptr->expand == EXPAND_Y) {
-      child->SetHeight(max_height);
-    }
-    SetWindowPos(child->GetHWND(), NULL, r.left + left_pad, start,
-      width, child->GetHeight(), SWP_NOZORDER);
-
-    start += child->GetHeight() + padding;
-  }
-}
-
 LRESULT CALLBACK
 MainWindow::WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -105,7 +60,7 @@ MainWindow::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 {
   switch (msg) {
   case WM_SIZE:
-    AdjustWindowSize();
+    layout();
     break;
   case WM_COMMAND:
     OnMenuClick((int)(LOWORD(wParam)));
@@ -119,23 +74,7 @@ MainWindow::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
   return 0;
 }
 
-void MainWindow::Show(void)
-{
-  WindowListElement *ptr;
-
-  Window::Show(); // show myself.
-
-  // Handle children
-  for (ptr = _wlist; ptr != NULL; ptr = ptr->next) {
-    Window *child = ptr->wnd;
-
-    child->Show();
-  }
-}
-
-MainWindow::MainWindow() :
-  Window(NULL, "xpMainWndClass", CW_USEDEFAULT, CW_USEDEFAULT),
-  _wlist{NULL}, _wtail{NULL}
+MainWindow::MainWindow() : CompositeFrame{}
 {
 }
 
@@ -171,34 +110,6 @@ bool MainWindow::Create(const char *title)
     WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_CLIPSIBLINGS |
     WS_CLIPCHILDREN | WS_BORDER | WS_DLGFRAME | WS_OVERLAPPEDWINDOW |
     WS_MINIMIZEBOX | WS_MAXIMIZEBOX, title);
-}
-
-void MainWindow::add_child(Window *child, int expand)
-{
-  WindowListElement *nw;
-
-  nw = new WindowListElement;
-  nw->wnd = child;
-  nw->expand = expand;
-  nw->next = NULL;
-  nw->prev = NULL;
-
-  // First element.
-  if (_wlist == NULL) {
-    _wlist = _wtail = nw;
-  } else {
-    _wtail->next = nw;
-    nw->prev = _wtail;
-    _wtail = nw;
-  }
-}
-
-void MainWindow::layout(void)
-{
-  AdjustWindowSize();
-
-  // Tell app to repaint itself.
-  InvalidateRect(m_hwnd, NULL, TRUE);
 }
 
 } // End of namespace XP
