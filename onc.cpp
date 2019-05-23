@@ -270,8 +270,7 @@ int main(int argc, const char *argv[])
 
   OncApp app;
 
-  if (!app.Register(MAKEINTRESOURCE(ONC_ICON),
-      MAKEINTRESOURCE(IDMAINMENU))) {
+  if (!app.Register(MAKEINTRESOURCE(IDMAINMENU))) {
     MessageBox(NULL, "Program failed to start due to class registration "
         "failure.", szMainWindowText, MB_OK | MB_ICONEXCLAMATION);
     return -1;

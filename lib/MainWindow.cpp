@@ -82,7 +82,7 @@ MainWindow::~MainWindow()
 {
 }
 
-bool MainWindow::Register(const char *icon, const char *menu)
+bool MainWindow::Register(const char *menu)
 {
   WNDCLASS wc;
 
@@ -96,7 +96,7 @@ bool MainWindow::Register(const char *icon, const char *menu)
   wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
   wc.lpszClassName = className_;
   wc.lpszMenuName = menu;
-  wc.hIcon = LoadIcon(hInst, icon);
+  wc.hIcon = LoadIcon(hInst, IDI_APPLICATION);
   if (!RegisterClass(&wc)) {
     return false;
   }

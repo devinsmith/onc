@@ -23,8 +23,6 @@
  */
 
 #define	IDD_ABOUT	100
-#define	ONC_ICON	101
-#define	ICO_ABOUT	103
 #define	ID_WEBP	108
 #define	IDM_NEW	200
 #define	IDM_OPEN	210

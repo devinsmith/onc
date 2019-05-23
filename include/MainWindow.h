@@ -33,7 +33,7 @@ public:
   virtual ~MainWindow();
   virtual void OnMenuClick(int id) { /* do nothing */ }
   bool Create(const char *title);
-  bool Register(const char *icon, const char *menu);
+  bool Register(const char *menu);
 protected:
   static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT msg,
       WPARAM wParam, LPARAM lParam);

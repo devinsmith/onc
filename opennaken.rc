@@ -51,9 +51,9 @@ STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "About OpenNaken"
 FONT 8, "Helv"
 BEGIN
-    LTEXT           "Written by:", ONC_ICON, 23, 64, 65, 12
+    LTEXT           "Written by:", IDI_APPLICATION, 23, 64, 65, 12
     GROUPBOX        "OpenNaken Information", 102, 11, 46, 158, 102
-    ICON            ONC_ICON, -1, 15, 12, 21, 20
+    ICON            IDI_APPLICATION, -1, 15, 12, 21, 20
     PUSHBUTTON      "OK", IDOK, 11, 156, 40, 14
     LTEXT           "Devin Smith", 104, 34, 89, 70, 12
     CONTROL         "OPENNAKEN", 106, "Static", SS_LEFTNOWORDWRAP | WS_GROUP,
@@ -62,7 +62,7 @@ BEGIN
                     107, 27, 113, 114, 29
     PUSHBUTTON      "Web Page", ID_WEBP, 76, 156, 91, 14, WS_DISABLED
 END
-101 ICON "floppy.ico"
+IDI_APPLICATION ICON "floppy.ico"
 
 IDD_NEW DIALOG 119, 140, 205, 120
 STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
