@@ -74,6 +74,9 @@ LRESULT CALLBACK
 DialogWindow::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 {
   switch (msg) {
+  case WM_SIZE:
+    layout();
+    break;
   case WM_CLOSE:
     EnableWindow(parent_->GetHWND(), TRUE);
     SetActiveWindow(parent_->GetHWND());
